@@ -1,0 +1,45 @@
+{
+    "user_id": "00000",
+    "password": "password",
+    "theme": "dark",
+    "user_icon": "default_user.png",
+    "user_dir": "C:/tmp",
+    "rules": [
+        {
+            "file": "./.nami/default_instruction.md",
+            "disabled": true
+        },
+        {
+            "file": "./.nami/deveropment_instruction.md",
+            "disabled": false
+        },
+        {
+            "file": "./.nami/custom_instruction.md",
+            "disabled": true
+        }
+    ],
+    "model_list": [
+        "gemini-2.5-flash-preview-05-20",
+        "gemini-2.5-pro-preview-05-20",
+        "gpt-4.1-mini",
+        "gpt-4.1",
+        "o4-mini",
+        "o3",
+        "gpt-5-mini",
+        "gpt-5"
+    ],
+    "select_model": "gemini-2.5-flash-preview-05-20",
+    "temperature": 0.6,
+    "max_tokens": 102400,
+    "top_p": 0.95,
+    "search_knowledge": "False",
+    "markdown": "True",
+    "reasoning": "True",
+    "structured_outputs": "True",
+    "stream": "True",
+    "show_full_reasoning": "True",
+    "reasoning_max_steps": 10,
+    "enable_user_memories": "True",
+    "enable_agentic_memory": "True",
+    "add_memory_references": "True"
+}

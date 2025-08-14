@@ -1,0 +1,896 @@
+/* style.css */
+:root{
+    --primary-bg:#2a2a2a;
+    --secondary-bg:#1a1a1a;
+    --tertiary-bg:#3a3a3a;
+    --fourth-bg:#4a4a4a;
+    --primary-text:#e0e0e0;
+    --accent-color:#4a90e2;
+    --accent-hover:#5aa1f2;
+    --border-color:#444;
+    --modal-row-color:#4a90e21a;
+}
+
+/* 明示的なdark指定（デフォルトと同一値） */
+:root[data-theme="dark"]{
+    --primary-bg:#2a2a2a;
+    --secondary-bg:#1a1a1a;
+    --tertiary-bg:#3a3a3a;
+    --fourth-bg:#4a4a4a;
+    --primary-text:#e0e0e0;
+    --accent-color:#4a90e2;
+    --accent-hover:#5aa1f2;
+    --border-color:#444;
+    --modal-row-color:rgba(74, 144, 226, 0.102);
+}
+
+/* lightテーマ用のカラーセット */
+:root[data-theme="light"]{
+    --primary-bg:#f7f7f7;
+    --secondary-bg:#ffffff;
+    --tertiary-bg:#f0f0f0;
+    --fourth-bg:#eaeaea;
+    --primary-text:#1a1a1a;
+    --accent-color:#0066cc;
+    --accent-hover:#1a78d6;
+    --border-color:#ddd;
+    --modal-row-color:#c6d0db1a;
+}
+*{box-sizing:border-box}
+
+/* 根本的な修正：HTMLドキュメントのスクロールを無効化 */
+html, body {
+    height: 100vh;
+    overflow: hidden; /* HTMLドキュメント全体のスクロールを無効化 */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial;
+    background: var(--primary-bg);
+    color: var(--primary-text);
+}
+
+blockquote {
+    padding-left: var(--lineHeight);
+    border-left: 2px solid #ccc;
+}
+  
+h1 > a.anchor,
+h2 > a.anchor,
+h3 > a.anchor,
+h4 > a.anchor,
+h5 > a.anchor,
+h6 > a.anchor {
+    display: inline-block;
+    float: left;
+    height: 1.2em;
+    width: 1em;
+    margin-left: -1em;
+    position: relative;
+    outline: none;
+  }
+/*.anchor:target { background: yellow; }*/
+h1 > a.anchor:before,
+h2 > a.anchor:before,
+h3 > a.anchor:before,
+h4 > a.anchor:before,
+h5 > a.anchor:before,
+h6 > a.anchor:before {
+    visibility: hidden;
+    position: absolute;
+    opacity: 0.2;
+    right:0;
+    top:0;
+    width:  1em;
+    font-weight:300;
+    line-height: inherit;
+    content: ""; /* U+E08F */
+    text-align: center;
+}
+h1 > a.anchor:hover:before,
+h2 > a.anchor:hover:before,
+h3 > a.anchor:hover:before,
+h4 > a.anchor:hover:before,
+h5 > a.anchor:hover:before,
+h6 > a.anchor:hover:before {
+    visibility: visible;
+    opacity:0.8;
+}
+h1 > a.anchor:focus:before,
+h2 > a.anchor:focus:before,
+h3 > a.anchor:focus:before,
+h4 > a.anchor:focus:before,
+h5 > a.anchor:focus:before,
+h6 > a.anchor:focus:before,
+h1:hover .anchor:before,
+h2:hover .anchor:before,
+h3:hover .anchor:before,
+h4:hover .anchor:before,
+h5:hover .anchor:before,
+h6:hover .anchor:before {
+    visibility: visible;
+}
+
+/** ul内のli要素間の余白を狭める */
+ul li {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1.3;
+}
+
+/* デフォルトのul, olのpadding/マージンをリセットして狭くする */
+ul, ol {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+    padding-left: 1.2em;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5em 0;
+    font-size: 1em;
+    background-color: var(--secondary-bg);
+}
+
+thead tr {
+    background-color: var(--accent-hover);
+}
+
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 0.5em 0.8em;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    color: var(--primary-text);
+    font-weight: bold;
+    background-color: var(--accent-hover);
+}
+
+tbody tr {
+    background-color: var(--tertiary-bg);
+}
+
+/* tbody tr:nth-child(even) {
+    background-color: var(--tertiary-bg);
+} */
+
+td b, td strong {
+    font-weight: bold;
+}
+
+
+
+.app-container {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    height: 100vh; /* ビューポート高さに固定 */
+    transition: grid-template-columns .25s ease;
+    overflow: hidden; /* コンテナ自体のスクロールも無効化 */
+}
+
+.app-container.sidebar-collapsed {
+    grid-template-columns: 0 1fr;
+}
+/* サイドバーが折りたたまれた時のchat-formの位置調整 */
+.app-container.sidebar-collapsed .chat-form {
+    left: 0; /* サイドバーが折りたたまれた時は左端に配置 */
+    width: 100%; /* 全幅を使用 */
+}
+
+.hamburger {
+    position: fixed;
+    left: 12px;
+    top: 14px;
+    z-index: 1100;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    height: auto;
+    line-height: 1;
+}
+
+.hamburger:hover {
+    background: var(--tertiary-bg);
+}
+
+/* Sidebar - 高さを100%に固定してスクロールを内部で制御 */
+.sidebar {
+    width: 260px;
+    height: 100vh; /* ビューポート高さに固定 */
+    background: var(--secondary-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    transition: transform .25s ease;
+    transform: translateX(0);
+    z-index: 1000;
+    position: relative;
+    overflow: hidden; /* サイドバー全体のスクロールを無効化 */
+}
+
+.sidebar.collapsed {
+    transform: translateX(-280px);
+}
+
+.sidebar-top {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* サイズ固定 */
+    background: var(--secondary-bg);
+    z-index: 100;
+}
+
+
+.sidebar-bottom {
+    padding: 3px;
+    border-top: 1px solid var(--border-color);
+    background: var(--secondary-bg);
+    z-index: 100;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.sidebar-controls{margin-top:10px; display:flex; flex-direction:column; gap:8px}
+.branding{display:flex; align-items:center; gap:10px}
+.brand-icon{width:25px; height:25px; object-fit:contain; margin-left: 35px; border-radius: 5px;}
+.brand-title{font-weight:700; font-size:1.2rem; color:var(--accent-color);}
+
+.full-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer
+}
+.full-btn:hover{background: var(--tertiary-bg)}
+
+.seatch-chat-input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--primary-text);
+    text-align: center;
+}
+
+.chat-history-list {
+    list-style:none;
+    padding:0;
+    margin:0;
+    overflow-y:auto;
+    height: calc(100vh - 170px); /* sidebar-topとsidebar-bottomの高さの合計を引く */ 
+    position: relative;
+}
+.history-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    border-bottom:1px
+    solid var(--border-color);
+    cursor:pointer
+}
+.history-item:hover {
+    background-color: var(--tertiary-bg);
+}
+.history-item:hover .history-title,
+.history-item:hover .thread-delete-btn {
+    background-color: var(--tertiary-bg);
+}
+.history-item.active .history-title {
+    color: var(--accent-color);
+}
+.history-title{flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:8px}
+.thread-delete-btn{background:transparent; border:none; color:var(--secondary-text); cursor:pointer}
+.thread-delete-btn:hover{color:#ff6b6b}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.setting-btn{
+    background:transparent;
+    border:none;
+    color:var(--primary-text);
+    cursor:pointer;
+    height:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px;
+}
+.icon-btn{
+    background:transparent;
+    border:none;
+    color:var(--primary-text);
+    cursor:pointer;
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px;
+}
+
+/* Chat Area - 高さを100%に固定 */
+.chat-area {
+    height: 100vh; /* ビューポート高さに固定 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* チャットエリア全体のスクロールを無効化 */
+}
+
+.chat-window {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto; /* この要素のみスクロール可能 */
+    position: relative;
+    padding-bottom: 40px; /* chat-formの高さ分の余白 */
+    /* スムーズスクロールを追加 */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    will-change: scroll-position;
+}
+#chat-container{display:flex; flex-direction:column; gap:12px}
+
+
+/* サイドバーが折りたたまれた時のuploaded-files-previewの位置調整 */
+.app-container.sidebar-collapsed .uploaded-files-preview {
+    left: 0;
+}
+
+.thought-process-output {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    word-break: break-all;
+}
+
+/* Uploaded Files Preview - 絶対位置に戻す */
+.uploaded-files-preview {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0px; /* chat-formの上に配置 */
+    padding: 3px;
+    background: transparent;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 90;
+}
+
+.uploaded-file-item {
+    display: flex;
+    align-items: center;
+    background: var(--tertiary-bg);
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: var(--primary-text);
+    font-size: 0.9em;
+    position: relative;
+}
+
+.uploaded-file-item .file-icon {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+.uploaded-file-item .file-name {
+    max-width: 100px; /* ファイル名の最大幅 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.uploaded-file-item .remove-file-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    font-size: 0.8em;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 0;
+    line-height: 1;
+}
+
+.uploaded-file-item .remove-file-btn:hover {
+    color: #ff0000;
+}
+
+/* Chat Form - 相対位置に変更 */
+.chat-form {
+    padding: 6px;
+    border-top: 1px solid var(--border-color);
+    background: var(--primary-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative; /* fixedからrelativeに変更 */
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
+    flex-shrink: 0; /* サイズ固定 */
+}
+
+.input-main-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+/* メッセージ入力フィールドの修正（5行対応） */
+#message-input {
+    flex: 1;
+    padding: 6px;
+    border-radius: 8px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--primary-text);
+    resize: none;
+    min-height: 40px;
+    line-height: 1.5;
+    font-size: 14px;
+    overflow-y: hidden; /* 初期状態ではスクロールバーを非表示 */
+    transition: height 0.1s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+    /* 最大高さは動的に計算されるため、ここでは設定しない */
+}
+
+/* 5行を超えた場合のスクロール表示 */
+#message-input.scrollable {
+    overflow-y: auto;
+}
+
+.send-btn, .stop-btn {
+    padding:5px 12px;
+    background:var(--accent-color);
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 高さを固定してボタンが変わらないようにする */
+    height: 40px;
+    min-width: 40px;
+}
+.stop-btn i {
+    font-size: 1.2em;
+    position: relative;
+}
+.stop-btn i::before {
+    content: '\f04d';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.input-actions-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 6px;
+}
+.input-actions-row .icon-btn, .model-select{background:var(--secondary-bg); border:1px solid var(--border-color); border-radius:6px; color:var(--primary-text); padding:6px; cursor:pointer}
+.model-select{padding:6px;}
+
+/* MCP indicators */
+.mcp-status{display:inline-block; width:12px; height:12px; border-radius:50%; margin-left:6px; vertical-align:middle}
+.mcp-status.ok{background:blue}
+.mcp-status.warn{background:gold}
+.mcp-status.error{background:red}
+.mcp-status.unknown{background:gray}
+
+/* MCP modal */
+.modal{
+    display:none;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    align-items:center;
+    justify-content:center;
+    z-index: 100;
+}
+.modal .modal-content{background:var(--fourth-bg); padding:18px; border-radius:10px; width:90%; max-width:520px; max-height:90vh; overflow-y:auto}
+.modal .modal-content{box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.modal .modal-content h2{margin:0 0 12px 0; color:var(--primary-text)}
+
+/* Settings form */
+.settings-form{display:flex; flex-direction:column; gap:10px; margin-top:8px}
+.setting-row{display:grid; grid-template-columns:1fr 2fr; gap:10px; align-items:center}
+.setting-label{font-size:0.9rem; color:var(--primary-text); opacity:.9}
+.setting-row input[type="text"],
+.setting-row input[type="number"],
+.setting-row textarea,
+.setting-row select{background:var(--secondary-bg); border:1px solid var(--border-color); color:var(--primary-text); padding:6px 8px; border-radius:6px; width:100%}
+.setting-row textarea{min-height:80px; resize:vertical}
+.setting-row input[type="checkbox"]{justify-self:start; transform:scale(1.1)}
+#save-settings-btn{width:100%; margin-top:12px; background:var(--accent-color); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer}
+#save-settings-btn:hover{background:var(--accent-hover)}
+
+/* Memory Modal Styles */
+.memory-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+.memory-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: var(--tertiary-bg);
+}
+.memory-content {
+    flex: 1;
+    padding-right: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(100% - 40px);
+}
+.delete-memory-btn {
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.delete-memory-btn:hover {
+    background-color: #cc3333;
+}
+
+.mcp-list{display:flex; flex-direction:column; gap:8px; margin-bottom:12px}
+.mcp-row{display:flex; align-items:center; padding:8px; border-radius:6px; background:var(--tertiary-bg)}
+.mcp-host{font-size:0.85rem; color:var(--primary-text); flex-grow: 1;}
+.mcp-status-dot{width:14px; height:14px; border-radius:50%}
+.status-ok{background:blue}
+.status-warn{background:gold}
+.status-connecting{background:gold}
+.status-error{background:red}
+.status-unknown{background:gray}
+.mcp-actions{display:flex; gap:8px}
+
+/* MCP Toggle Container */
+.mcp-toggle-container, .rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.mcp-toggle-wrapper, .rule-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: var(--tertiary-bg);
+    border-radius: 6px;
+}
+
+.toggle-label, .rule-file {
+    font-size: 0.85rem;
+    color: var(--primary-text);
+    flex-grow: 1;
+}
+
+/* Template Suggestions - 位置調整 */
+.template-suggestions {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 12px;
+    right: 12px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 6px;
+}
+
+.template-suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.template-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.template-suggestion-item:hover,
+.template-suggestion-item.highlighted {
+    background: var(--tertiary-bg);
+}
+
+/* Toggle Switch Styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    margin: 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--accent-color);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
+}
+
+/* Rules Modal Specific Styles */
+.rules-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+/* Clickable rule file styling */
+.clickable-rule-file {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.clickable-rule-file:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Add some visual feedback for the clickable state */
+.rule-row .clickable-rule-file {
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.rule-row .clickable-rule-file:hover {
+    background-color: var(--modal-row-color);
+}
+
+/* Delete Rule Button */
+.delete-rule-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b; /* 赤色 */
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.delete-rule-btn:hover {
+    color: #ff0000; /* ホバーでより濃い赤 */
+}
+
+/* Message Bubbles */
+.message-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%; /* chat-containerいっぱいに広げる */
+    padding: 10px 12px;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    color: var(--primary-text);
+}
+
+.message-container.user-message .message-bubble {
+    background: var(--secondary-bg); /* ユーザーメッセージの背景色 */
+    align-self: flex-end; /* ユーザーメッセージは右寄せ */
+}
+
+.message-container.ai-message .message-bubble {
+    background: var(--tertiary-bg); /* AIメッセージの背景色 */
+    align-self: flex-start; /* AIメッセージは左寄せ */
+}
+
+.message-bubble .icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.message-content {
+    flex-grow: 1;
+}
+
+.close-button {
+    cursor: pointer;
+}
+
+/* モバイル対応 */
+@media (max-width: 800px) {
+    .sidebar {
+        position: fixed;
+        height: 100vh;
+        width: 260px;
+    }
+    
+    .app-container {
+        grid-template-columns: 0 1fr;
+    }
+    
+    .app-container.sidebar-collapsed {
+        grid-template-columns: 0 1fr;
+    }
+}
+
+/* 全体：画面幅を超えないようにする */
+pre {
+    max-width: 100%;
+    box-sizing: border-box;       /* パディングを幅に含める */
+    margin: 0 0 1rem 0;
+    padding: 1rem;
+    white-space: pre-wrap;        /* 折り返しを許可（重要） */
+    word-wrap: break-word;        /* 長い語を折る */
+    overflow-wrap: anywhere;      /* 単語の途中でも折る（必要に応じて） */
+    -webkit-font-smoothing: antialiased;
+    -webkit-overflow-scrolling: touch;
+    background: #0b0f14;         /* hljs 背景色に合わせて調整 */
+    border-radius: 8px;
+    line-height: 1.6;
+}
+  
+/* code 要素：pre の幅に合わせる */
+pre { 
+    background: transparent !important; 
+    padding: 1px;
+}
+code {border-radius: 6px;}
+pre > code,
+pre code.language-markdown,
+code.language-markdown.hljs {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: inherit;         /* pre の折り返し設定を継承 */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Noto Sans Mono", monospace;
+    font-size: 14px;
+    color: #e6eef6;
+}
+  
+/* 小さい画面ではフォントと余白を縮める */
+@media (max-width: 480px) {
+pre { padding: 0.75rem; }
+pre > code { font-size: 13px; }
+}
+
+
+.scroll-to-bottom-btn {
+    position: fixed; /* stickyからfixedに変更 */
+    bottom: 100px; /* 入力フォームの上に配置 */
+    right: 20px; /* 右端から20px */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* 丸形 */
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    opacity: 0; /* 初期状態で透明 */
+    transform: translateY(10px); /* 初期状態で少し下に */
+}
+
+.scroll-to-bottom-btn.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.scroll-to-bottom-btn:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
+}
+
+.scroll-to-bottom-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-to-bottom-btn:focus {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(var(--accent-color-rgb), 0.3);
+}

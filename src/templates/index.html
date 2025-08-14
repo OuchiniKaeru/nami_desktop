@@ -1,0 +1,148 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/static/icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAMI Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="text/javascript" src='https://cdn.jsdelivr.net/gh/rsms/markdown-wasm@v1.1.2/dist/markdown.js'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Hamburger / sidebar toggle -->
+        <button id="sidebar-toggle" class="hamburger" aria-label="Toggle sidebar">≡</button>
+
+        <!-- Sidebar for Chat History -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-top">
+                <div class="branding">
+                    <img src="/static/icon.png" alt="NAMI" class="brand-icon">
+                    <span class="brand-title">NAMI</span>
+                </div>
+                <div class="sidebar-controls">
+                    <button id="new-chat-btn" class="full-btn">+ New Chat</button>
+                    <input id="search-chat-input" class="seatch-chat-input" type="text" placeholder="チャットを検索">
+                </div>
+            </div>
+
+            <ul id="chat-history-list" class="chat-history-list">
+                <!-- list populated by script.js -->
+            </ul>
+
+            <div class="sidebar-bottom">
+                <button id="settings-btn" class="setting-btn">⚙️ 設定</button>
+                <button id="memory-btn" class="setting-btn" title="メモリ">📝 メモリ</button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <div  id="chat-window" class="chat-window">
+                <div id="chat-container" class="chat-container"></div>
+                <div id="uploaded-files-preview" class="uploaded-files-preview"></div>
+            </div>
+
+            <!-- スクロールボタンをチャットウィンドウの外に移動 -->
+            <button id="scroll-to-bottom-btn" class="scroll-to-bottom-btn" style="display: none;">↓</button>
+
+            <!-- Message Input Form -->
+            <form id="chat-form" class="chat-form">
+                <div id="template-suggestions" class="template-suggestions">
+                    <!-- Template suggestions will be listed here -->
+                </div>
+                <div class="input-main-row">
+                    <textarea id="message-input" placeholder="Type your message here..." rows="1"></textarea>
+                    <button type="submit" id="send-btn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                    <button type="button" id="stop-btn" class="stop-btn" style="display: none;"><i class="fas fa-square"></i></button>
+                </div>
+                <div class="input-actions-row">
+                    <button type="button" id="at-btn" class="icon-btn">@</button>
+                    <button type="button" id="file-upload-btn" class="icon-btn" title="ファイル/画像追加">＋</button>
+                    <button type="button" id="mcp-btn" class="icon-btn mcp-btn" title="MCP設定">🛢️ <span id="mcp-status" class="mcp-status"></span></button>
+                    <button type="button" id="system-prompt-btn" class="icon-btn" title="システムプロンプト/ルール登録">⚖️</button>
+                    <select id="model-select" class="model-select" title="モデル選択">
+                        <!-- Options will be populated by script.js -->
+                    </select>
+                    <input type="file" id="file-input" style="display: none;" multiple>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', path='script.js') }}"></script>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Settings</h2>
+            <h6>NAMI desktop ver.0.10</h6>
+            <div id="settings-form" class="settings-form"></div>
+            <textarea id="settings-json" rows="20" style="width: 100%; font-family: monospace; display: none;"></textarea>
+            <button id="save-settings-btn" class="full-btn">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- Memories Modal -->
+    <div id="memories-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Memories</h2>
+            <div id="memory-list" class="memory-list">
+                <!-- Memories will be listed here -->
+            </div>
+            <div class="memories-actions">
+                <button id="all-delete-btn" class="full-btn">All Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MCP Modal -->
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>MCP Servers</h2>
+            <div id="mcp-list" class="mcp-list">
+                <!-- MCP servers will be listed here -->
+            </div>
+            <div class="mcp-actions">
+                <button id="mcp-reload-btn" class="full-btn">Reload MCP</button>
+                <button id="edit-settings-json-btn" class="full-btn">Edit mcp_settings.json</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div id="template-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>テンプレート選択</h2>
+            <div id="template-list" class="template-list">
+                <!-- Template keys will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Rules Settings</h2>
+            <div id="rules-list" class="rules-list">
+                <!-- Rules will be listed here -->
+            </div>
+            <div class="rules-actions">
+                <button id="add-rule-btn" class="full-btn">+ add rule</button>
+                <button id="save-rules-btn" class="full-btn">Save Rules</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
