@@ -15,10 +15,10 @@ class GetUserMemory:
         self.agent = None
         if getattr(sys, 'frozen', False):
             # exe 実行時
-            BASE_DIR = os.path.dirname(sys.executable)
+            EXTERNAL_BASE = os.path.dirname(sys.executable)
         else:
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self.project_dir = os.path.dirname(BASE_DIR)
+            EXTERNAL_BASE = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        self.project_dir = os.path.dirname(EXTERNAL_BASE)
         self.user_id = None
         self.query = query
         self.memory = None

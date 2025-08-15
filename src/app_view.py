@@ -5,14 +5,17 @@ import requests
 import time
 import os
 import sys
-from src.main import app
 
 if getattr(sys, 'frozen', False):
-    # exe 実行時
-    BASE_DIR = os.path.dirname(sys.executable)
+    INTERNAL_BASE = sys._MEIPASS
+    PROJECT_ROOT = os.path.dirname(INTERNAL_BASE)
+    if PROJECT_ROOT not in sys.path:
+        sys.path.insert(0, PROJECT_ROOT)
 else:
     # スクリプト実行時
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    INTERNAL_BASE = os.path.dirname(os.path.abspath(__file__))
+
+from src.main import app
 
 def start_server():
     uvicorn.run(app, host="127.0.0.1", port=8000)
@@ -28,12 +31,14 @@ def wait_and_load(window):
 
 if __name__ == "__main__":
     threading.Thread(target=start_server, daemon=True).start()
-    loading_path = os.path.abspath(os.path.join(BASE_DIR, "templates", "loading.html"))
-    icon_path = os.path.abspath(os.path.join(BASE_DIR, "static", "icon.png"))
+    loading_path = os.path.abspath(os.path.join(INTERNAL_BASE, "templates", "loading.html"))
+    icon_path = os.path.abspath(os.path.join(INTERNAL_BASE, "static", "icon.png"))
     window = webview.create_window(
         "My App",
         f"file:///{loading_path}",
-        maximized=True
+        maximized=True,
+        text_select=True,
     )
     threading.Thread(target=wait_and_load, args=(window,), daemon=True).start()
-    webview.start(icon=icon_path)
+    webview.settings['OPEN_DEVTOOLS_IN_DEBUG'] = False
+    webview.start(icon=icon_path, debug=True)

@@ -9,10 +9,10 @@ import json
 def get_db_connection():
     if getattr(sys, 'frozen', False):
         # exe 実行時
-        BASE_DIR = os.path.dirname(sys.executable)
+        EXTERNAL_BASE = os.path.dirname(sys.executable)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(os.path.dirname(BASE_DIR), "chat_history.db")
+        EXTERNAL_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DB_PATH = os.path.join(os.path.dirname(EXTERNAL_BASE), "chat_history.db")
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
@@ -71,10 +71,13 @@ def get_or_create_thread_by_session_id(session_id):
     conn.close()
     return thread_id
 
-def get_threads():
+def get_threads(user_id):
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM threads ORDER BY created_at DESC")
+    if user_id:
+        c.execute("SELECT * FROM threads WHERE session_id IN (SELECT session_id FROM agent_sessions WHERE user_id = ?) ORDER BY created_at DESC", (user_id,))
+    else:
+        c.execute("SELECT * FROM threads ORDER BY created_at DESC")
     threads = c.fetchall()
     conn.close()
     return threads
@@ -100,7 +103,7 @@ def get_messages_for_thread(session_id):
     # return messages
     return parsed_memory
 
-def search_threads_and_agent_sessions(query):
+def search_threads_and_agent_sessions(query, user_id):
     conn = get_db_connection()
     c = conn.cursor()
 
@@ -190,13 +193,14 @@ def search_threads_and_agent_sessions(query):
 
     groups = parse_boolean_query(query or '')
     # 空（条件なし）の場合は全件返す
+    # user_idが一致している条件を追加
     if not groups:
-        rows = c.execute("SELECT id, title, session_id, created_at FROM threads ORDER BY created_at DESC").fetchall()
+        rows = c.execute("SELECT id, title, session_id, created_at FROM threads WHERE user_id = ? ORDER BY created_at DESC", (user_id,)).fetchall()
         conn.close()
         return rows
 
     results = []
-    threads = c.execute("SELECT id, title, session_id, created_at FROM threads ORDER BY created_at DESC").fetchall()
+    threads = c.execute("SELECT id, title, session_id, created_at FROM threads WHERE user_id = ? ORDER BY created_at DESC", (user_id,)).fetchall()
 
     for t in threads:
         # タイトルとメモリから検索用コーパスを構築（生/デコード済の両方）

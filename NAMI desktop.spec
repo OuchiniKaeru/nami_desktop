@@ -8,6 +8,7 @@ a = Analysis(
         ('src/static', 'static'),
         ('src/templates', 'templates'),
         ('src/core', 'core'),
+        ('src/main.py', 'main.py'),
         ('.env', '.'),
     ],
     hiddenimports=[],

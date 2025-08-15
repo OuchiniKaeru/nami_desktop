@@ -2,8 +2,6 @@ import os
 import sys
 from dotenv import load_dotenv
 
-load_dotenv()
-
 import uuid
 import time
 import json
@@ -26,13 +24,21 @@ active_tasks = {}
 global_mcp_hub = None
 global_mcp_tools = None
 if getattr(sys, 'frozen', False):
-    # exe 実行時
-    BASE_DIR = os.path.dirname(sys.executable)
+    INTERNAL_BASE = sys._MEIPASS
 else:
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    INTERNAL_BASE = os.path.dirname(os.path.abspath(__file__))
+
+env_file = os.path.join(INTERNAL_BASE, ".env")
+load_dotenv(env_file)
+
+    # 外部ファイル用（exe外に置く: .nami, img, uploads） =====
+if getattr(sys, 'frozen', False):
+    EXTRERNAL_BASE = os.path.dirname(sys.executable)
+else:
+    EXTRERNAL_BASE = os.path.dirname(os.path.abspath(__file__))
 
 # 外部フォルダのパスを指定
-project_root = os.path.dirname(BASE_DIR)
+project_root = os.path.dirname(EXTRERNAL_BASE)
 mcp_setting_path = os.path.join(project_root, ".nami", "mcp_setting.json")
 setting_path = os.path.join(project_root, ".nami", "setting.json")
 upload_dir_path = os.path.join(project_root, "uploads")
@@ -41,10 +47,10 @@ upload_dir_path = os.path.join(project_root, "uploads")
 app = FastAPI()
 
 # Mount the static directory
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
-app.mount("/base_dir", StaticFiles(directory=os.path.dirname(BASE_DIR)), name="base_dir")
+app.mount("/static", StaticFiles(directory=os.path.join(INTERNAL_BASE, "static")), name="static")
+app.mount("/base_dir", StaticFiles(directory=os.path.dirname(EXTRERNAL_BASE)), name="base_dir")
 
-templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+templates = Jinja2Templates(directory=os.path.join(INTERNAL_BASE, "templates"))
 
 # --------------- MCP設定 ---------------
 def load_mcp_hub():
@@ -148,6 +154,7 @@ async def start_task(
     files: list[UploadFile] = File([])
 ):
     print(f"DEBUG: Received POST request to /task. Task: {task}, Session ID: {session_id}, Files: {[f.filename for f in files]}") # デバッグログ追加
+    print(f'google: {os.environ.get("GOOGLE_API_KEY")}')
     if not os.environ.get("GOOGLE_API_KEY"):
         raise HTTPException(status_code=400, detail="GOOGLE_API_KEY environment variable not set.")
 
@@ -258,17 +265,29 @@ async def stop_agent(request: Request):
 # --------------- スレッド ---------------
 @app.get("/threads")
 async def get_threads():
-    threads = database.get_threads()
+    user_id = ""
+    if os.path.exists(setting_path):
+        with open(setting_path, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+        user_id = settings.get("user_id")
+    threads = database.get_threads(user_id)
     return [{"id": thread["id"], "title": thread["title"], "session_id": thread["session_id"]} for thread in threads]
 
 @app.post("/chat-search")
 async def chat_search(request: Request):
     data = await request.json()
     query = (data.get("query") or "").strip()
+
+    user_id = ""
+    if os.path.exists(setting_path):
+        with open(setting_path, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+        user_id = settings.get("user_id")
+
     if not query:
-        threads = database.get_threads()
+        threads = database.get_threads(user_id)
     else:
-        threads = database.search_threads_and_agent_sessions(query)
+        threads = database.search_threads_and_agent_sessions(query, user_id)
     return [{"id": t["id"], "title": t["title"], "session_id": t["session_id"]} for t in threads]
 
 @app.get("/threads/{session_id}")

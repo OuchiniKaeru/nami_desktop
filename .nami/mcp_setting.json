@@ -21,7 +21,7 @@
                 "MCP_RESEARCH_MAX_ITERATIONS": "10"
             },
             "timeout_seconds": 7200,
-            "disabled": false
+            "disabled": true
         },
         "context7": {
             "type": "stdio",
@@ -30,7 +30,7 @@
                 "-y",
                 "@upstash/context7-mcp@latest"
             ],
-            "disabled": false
+            "disabled": true
         }
     }
 }
