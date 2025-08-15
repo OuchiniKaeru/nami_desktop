@@ -21,7 +21,7 @@
                 "MCP_RESEARCH_MAX_ITERATIONS": "10"
             },
             "timeout_seconds": 7200,
-            "disabled": true
+            "disabled": false
         },
         "context7": {
             "type": "stdio",

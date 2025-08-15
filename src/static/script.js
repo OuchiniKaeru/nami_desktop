@@ -1641,7 +1641,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (editSettingsJsonBtn) {
         editSettingsJsonBtn.addEventListener('click', () => {
-            openRuleFile('mcp_setting.json');
+            openRuleFile('.nami/mcp_setting.json');
         });
     }
 
